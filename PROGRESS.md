@@ -16,21 +16,25 @@ train an MDRNN model on them.
    - Note: impsypi.local SSH host key had changed (Pi reflashed); user fixed
      known_hosts and set up key login.
 
-2. **Dataset built** with IMPSY:
+2. **Dataset built** with IMPSY, saved into this repo:
    ```
-   cd /Users/charles/src/impsy
-   poetry run python -m impsy dataset -D 9 -S /Users/charles/src/agentier-model-training/logs
+   poetry -C /Users/charles/src/impsy run python -m impsy dataset \
+     -D 9 -S /Users/charles/src/agentier-model-training/logs
    ```
-   Output: `/Users/charles/src/impsy/datasets/training-dataset-9d.npz`
-   (60,000 interactions, 7 performances, ~7.4 hrs of playing, dimension 9).
+   Output: `./datasets/training-dataset-9d.npz`
+   (60,000 interactions, 7 performances, ~7.4 hrs of playing, dimension 9, 471 KB).
+
+   Note: `-C` changes poetry's cwd, so the npz initially lands in
+   `/Users/charles/src/impsy/datasets/` and needs to be moved here.
 
 ## Next step — NOT YET RUN
 
 Training was about to start (user paused to switch Claude account). Run it with:
 
 ```
-cd /Users/charles/src/impsy
-poetry run python -m impsy train -D 9 -M s -S datasets/training-dataset-9d.npz \
+poetry -C /Users/charles/src/impsy run python -m impsy train \
+  -D 9 -M s \
+  -S /Users/charles/src/agentier-model-training/datasets/training-dataset-9d.npz \
   > /Users/charles/src/agentier-model-training/training.log 2>&1
 ```
 
