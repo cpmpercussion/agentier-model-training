@@ -1,6 +1,6 @@
 # Agentier model training — progress
 
-_Last updated: 2026-05-21_
+_Last updated: 2026-05-22_
 
 > IMPSY's `dataset` and `train` commands now accept `-O/--destination`, so
 > outputs can be written directly into this repo — no post-hoc moves needed.
@@ -37,22 +37,55 @@ train an MDRNN model on them.
    To rebuild from the logs in this repo, re-run the command above — `-O`
    writes the npz straight here, overwriting the existing file.
 
-## Next step — NOT YET RUN
+3. **Initial training run** completed with the default `s` (small) model:
 
-Training was about to start (user paused to switch Claude account). Run it with:
+   ```
+   mkdir -p /Users/charles/src/agentier-model-training/models
+   poetry -C /Users/charles/src/impsy run python -m impsy train \
+     -D 9 -M s \
+     -S /Users/charles/src/agentier-model-training/datasets/training-dataset-9d.npz \
+     -O /Users/charles/src/agentier-model-training/models \
+     > /Users/charles/src/agentier-model-training/training.log 2>&1
+   ```
+
+   - Model size: **`s` (small)** — good fit for Raspberry Pi deployment.
+   - 2 LSTM layers × 64 units, 5 mixtures, 58,143 params.
+   - Training shape: `(59650, 50, 9)` (sequence length 50, dim 9).
+   - Wallclock ~26 s/epoch, ~16 min total.
+
+   **Result: early-stopped at epoch 36/100.**
+   - Best `val_loss` = **13.00 at epoch 26** (next best: 13.04 @ ep19, 14.27 @ ep23).
+   - Train loss kept dropping (−7.6 → −9.8) while val plateaued/diverged — classic
+     overfit, so the default `--patience 10` triggered after 10 epochs without improvement.
+
+   Artifacts written to `./models/`:
+   - `musicMDRNN-dim9-layers2-units64-mixtures5-scale10-ckpt.keras` (727K) — **best checkpoint** (use this for deployment)
+   - `musicMDRNN-dim9-layers2-units64-mixtures5-scale10.keras` (268K) — final-epoch model
+   - `musicMDRNN-dim9-layers2-units64-mixtures5-scale10.tflite` (249K) — Pi-deployable
+
+## Next step — long training run
+
+The default run hit a val_loss wall around epoch 26 with `--patience 10`.
+To see if it can break past 13.00, try a longer run with much more patience
+(and consider raising `-N` so the cap isn't a constraint):
 
 ```
-mkdir -p /Users/charles/src/agentier-model-training/models
 poetry -C /Users/charles/src/impsy run python -m impsy train \
   -D 9 -M s \
   -S /Users/charles/src/agentier-model-training/datasets/training-dataset-9d.npz \
   -O /Users/charles/src/agentier-model-training/models \
-  > /Users/charles/src/agentier-model-training/training.log 2>&1
+  -P 50 -N 500 \
+  > /Users/charles/src/agentier-model-training/training-long.log 2>&1
 ```
 
-- Model size chosen: **`s` (small)** — good fit for Raspberry Pi deployment.
-- Early stopping is on by default.
-- Watch progress in `./training.log`.
+- `-P 50` raises patience from 10 → 50 epochs.
+- `-N 500` raises the epoch cap from 100 → 500.
+- If the wall really is overfit (not under-training), bigger patience won't
+  help on its own — also worth trying a larger model (`-M m` or `-M l`) or
+  a different batch size (`-B`).
+- The artifact filenames are the same shape as before, so this run will
+  **overwrite** the existing `./models/musicMDRNN-…` files. Move/rename
+  the current ones first if you want to keep them for comparison.
 
 ## Environment notes
 - IMPSY repo: `/Users/charles/src/impsy` (branch `main`, v1.0.1).
@@ -60,6 +93,7 @@ poetry -C /Users/charles/src/impsy run python -m impsy train \
 - Run impsy as `poetry run python -m impsy ...` (the `impsy` console script
   is not on PATH).
 
-## After training
-- Trained model lands in `./models/` (via `-O` above) — copy it to the
-  impsypi for use, or test locally with `impsy test-mdrnn`.
+## Deployment
+- For Pi use: copy `./models/musicMDRNN-dim9-layers2-units64-mixtures5-scale10.tflite`
+  (built from the best checkpoint) to the impsypi.
+- For local sanity check: `impsy test-mdrnn` against the `-ckpt.keras` file.
