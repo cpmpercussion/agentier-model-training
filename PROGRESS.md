@@ -29,6 +29,11 @@ train an MDRNN model on them.
    Output: `./datasets/training-dataset-9d.npz`
    (60,000 interactions, 7 performances, ~7.4 hrs of playing, dimension 9, 471 KB).
 
+   The suspiciously round 60,000 is coincidence + structure: the 7 logs hold
+   60,007 raw rows, and `transform_log_to_sequence_example` drops the first
+   row of each log (no prior timestamp to compute `dt` against), so
+   60,007 − 7 = 60,000 exactly.
+
    To rebuild from the logs in this repo, re-run the command above — `-O`
    writes the npz straight here, overwriting the existing file.
 
