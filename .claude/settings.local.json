@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ping -c 2 impsypi.local)",
+      "Bash(ssh -o BatchMode=yes -o ConnectTimeout=5 pi@impsypi.local 'ls -la impsy/logs/ | head -50')",
+      "Bash(ssh -o BatchMode=yes -o ConnectTimeout=5 pi@impsypi.local 'ls -la impsy/logs/ | head -60')",
+      "Bash(rsync *)",
+      "Read(//Users/charles/src/impsy/**)",
+      "Bash(poetry install *)",
+      "Bash(poetry run *)",
+      "Bash(git check-ignore *)",
+      "Read(//Users/charles/**)",
+      "Bash(git add *)"
+    ]
+  }
+}
