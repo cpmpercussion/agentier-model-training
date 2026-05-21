@@ -2,6 +2,9 @@
 
 _Last updated: 2026-05-21_
 
+> IMPSY's `dataset` and `train` commands now accept `-O/--destination`, so
+> outputs can be written directly into this repo — no post-hoc moves needed.
+
 ## Goal
 Collect IMPSY interaction logs from the Agentier instrument (impsypi.local) and
 train an MDRNN model on them.
@@ -19,22 +22,26 @@ train an MDRNN model on them.
 2. **Dataset built** with IMPSY, saved into this repo:
    ```
    poetry -C /Users/charles/src/impsy run python -m impsy dataset \
-     -D 9 -S /Users/charles/src/agentier-model-training/logs
+     -D 9 \
+     -S /Users/charles/src/agentier-model-training/logs \
+     -O /Users/charles/src/agentier-model-training/datasets
    ```
    Output: `./datasets/training-dataset-9d.npz`
    (60,000 interactions, 7 performances, ~7.4 hrs of playing, dimension 9, 471 KB).
 
-   Note: `-C` changes poetry's cwd, so the npz initially lands in
-   `/Users/charles/src/impsy/datasets/` and needs to be moved here.
+   To rebuild from the logs in this repo, re-run the command above — `-O`
+   writes the npz straight here, overwriting the existing file.
 
 ## Next step — NOT YET RUN
 
 Training was about to start (user paused to switch Claude account). Run it with:
 
 ```
+mkdir -p /Users/charles/src/agentier-model-training/models
 poetry -C /Users/charles/src/impsy run python -m impsy train \
   -D 9 -M s \
   -S /Users/charles/src/agentier-model-training/datasets/training-dataset-9d.npz \
+  -O /Users/charles/src/agentier-model-training/models \
   > /Users/charles/src/agentier-model-training/training.log 2>&1
 ```
 
@@ -49,5 +56,5 @@ poetry -C /Users/charles/src/impsy run python -m impsy train \
   is not on PATH).
 
 ## After training
-- Trained model lands in IMPSY's models directory — copy it back to the
+- Trained model lands in `./models/` (via `-O` above) — copy it to the
   impsypi for use, or test locally with `impsy test-mdrnn`.
