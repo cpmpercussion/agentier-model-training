@@ -10,7 +10,17 @@
       "Bash(poetry run *)",
       "Bash(git check-ignore *)",
       "Read(//Users/charles/**)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(mkdir -p /Users/charles/src/agentier-model-training/datasets)",
+      "Bash(poetry -C /Users/charles/src/impsy run python -m impsy dataset -D 9 -S /Users/charles/src/agentier-model-training/logs)",
+      "Bash(poetry -C /Users/charles/src/impsy run python -m impsy train -D 9 -M s -S /Users/charles/src/agentier-model-training/datasets/training-dataset-9d.npz -O /Users/charles/src/agentier-model-training/models)",
+      "Bash(grep -E \"^Epoch [0-9]+/100$|val_loss:|early stop|Restoring\" /Users/charles/src/agentier-model-training/training.log)",
+      "Bash(awk -F'val_loss: ' '{print NR, $2}')",
+      "Bash(sort -k2 -g)",
+      "Bash(poetry *)",
+      "Bash(pkill -f \"impsy run\")"
     ]
   }
 }
