@@ -88,7 +88,7 @@ poetry -C /Users/charles/src/impsy run python -m impsy train \
   the current ones first if you want to keep them for comparison.
 
 ## Environment notes
-- IMPSY repo: `/Users/charles/src/impsy` (branch `main`, v1.0.1).
+- IMPSY repo: `/Users/charles/src/impsy` (branch `main`, v1.1.0 — env synced 2026-09-25, tensorflow 2.21.0).
 - Dependencies installed via `poetry install` (poetry env already created).
 - Run impsy as `poetry run python -m impsy ...` (the `impsy` console script
   is not on PATH).
